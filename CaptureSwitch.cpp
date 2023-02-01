@@ -73,24 +73,6 @@ void CaptureSwitch::Event(bz_EventData *eventData ){
             cappingTeam = bz_getPlayerTeam(allowCapData->playerCapping);
             alive = 1;
             //
-            bz_APIIntList *playerList = bz_newIntList();
-            if (playerList) {
-                bz_getPlayerIndexList(playerList);
-                for ( unsigned int i = 0; i < playerList->size(); i++) {
-                    int targetID = (*playerList)[i];
-                    bz_BasePlayerRecord *playRec = bz_getPlayerByIndex ( targetID );
-                    if (playRec != NULL) {
-                        if ((playRec->spawned) && (playRec->team == cappingTeam)) {
-                            if (targetID != cappingPlayer) {
-                                bz_killPlayer(targetID, true, BZ_SERVER);
-                            }
-                        }
-                    }
-                    bz_freePlayerRecord(playRec);
-                }
-                bz_deleteIntList(playerList);
-            }
-            //
             bz_givePlayerFlag(cappingPlayer, teamToFlagType(basePoint), true);
             
         }
@@ -117,7 +99,7 @@ void CaptureSwitch::Event(bz_EventData *eventData ){
       bz_CTFCaptureEventData_V1* capData = (bz_CTFCaptureEventData_V1*)eventData;
       if (capData->playerCapping == cappingPlayer) {
         if (capData->teamCapping == cappingTeam) {
-            bz_killPlayer(capData->playerCapping, true, BZ_SERVER);
+            //bz_killPlayer(capData->playerCapping, true, BZ_SERVER);
             cappingPlayer = -1;
             alive = -1;
             cappingTeam = eNoTeam;
@@ -137,7 +119,7 @@ void CaptureSwitch::Event(bz_EventData *eventData ){
     }break;
 
     case bz_eTickEvent: {
-      if ((cappingPlayer != -1) && (alive = 1)) {
+      if ((cappingPlayer != -1) && (alive == 1)) {
         int flagID = bz_getPlayerFlagID(cappingPlayer);
         if (flagID != -1) {
             bz_eTeamType flagTeam = flagToTeamValue(bz_getFlagName(flagID).c_str());
